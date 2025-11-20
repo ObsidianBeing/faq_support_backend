@@ -19,8 +19,9 @@ class Settings(BaseSettings):
     PINECONE_API_KEY: str
     
     # Pinecone Configuration
-    PINECONE_ENVIRONMENT: str = "us-east-1-aws"
+    PINECONE_ENVIRONMENT: str = "us-east-1"
     PINECONE_INDEX_NAME: str = "faq-support-bot"
+    PINECONE_CLOUD: str = "aws"
     PINECONE_DIMENSION: int = 1536  # OpenAI ada-002 dimension
     PINECONE_METRIC: str = "cosine"
     
@@ -53,6 +54,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "allow"
 
 
 # Global settings instance

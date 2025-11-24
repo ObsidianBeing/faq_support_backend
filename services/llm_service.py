@@ -225,17 +225,22 @@ YOUR ANSWER:"""
         # Default medium confidence if no indicators
         return 0.6
     
-    def health_check(self) -> bool:
+    def health_check(self) -> dict:
         """
-        Check if LLM service is available.
+        Health check for the LLM provider.
+        Returns a standardized dict with status and optional error.
         """
         try:
-            if self.provider == 'openai':
-                # Simple API call to check availability
+            if self.provider == "openai":
+                # Minimal non-billing OpenAI call to validate API access
                 self.openai_client.models.list()
-                return True
-            elif self.provider == 'anthropic' and self.anthropic_client:
-                return True
-            return False
-        except:
-            return False
+                return {"status": "healthy"}
+    
+            elif self.provider == "anthropic" and self.anthropic_client:
+                # You may optionally add a test call
+                return {"status": "healthy"}
+    
+            return {"status": "unhealthy", "error": "Unsupported or uninitialized provider"}
+    
+        except Exception as e:
+            return {"status": "unhealthy", "error": str(e)}

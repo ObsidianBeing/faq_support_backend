@@ -3,6 +3,8 @@ Vector Store Service
 Manages Pinecone vector database operations
 """
 
+import time
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from pinecone import Pinecone, ServerlessSpec
 import openai
@@ -204,12 +206,36 @@ class VectorStoreService:
         except:
             return 0
     
-    async def health_check(self) -> bool:
+    async def health_check(self) -> Dict[str, Any]:
         """
-        Check if Pinecone connection is healthy.
+        Actually test Pinecone connection and performance.
         """
         try:
-            self.index.describe_index_stats()
-            return True
-        except:
-            return False
+            start = time.time()
+            
+            # Test 1: Can we query the index?
+            test_result = self.index.query(
+                vector=[0.1] * settings.PINECONE_DIMENSION,
+                top_k=1,
+                include_metadata=False
+            )
+            query_time = (time.time() - start) * 1000
+            
+            # Test 2: Get index stats
+            stats = self.index.describe_index_stats()
+            
+            return {
+                'status': 'healthy',
+                'query_latency_ms': round(query_time, 2),
+                'total_vectors': stats.total_vector_count,
+                'index_fullness': stats.index_fullness,
+                'dimension': settings.PINECONE_DIMENSION
+            }
+            
+        except Exception as e:
+            return {
+                'status': 'unhealthy',
+                'error': str(e),
+                'query_latency_ms': None,
+                'total_vectors': 0
+            }

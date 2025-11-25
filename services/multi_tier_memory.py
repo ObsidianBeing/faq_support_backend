@@ -48,7 +48,8 @@ class MultiTierMemory:
         
         # L4: Pinecone for semantic memory
         self.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-        self.memory_index = self.pc.Index("conversation-memory")
+        self.memory_index = self.pc.Index(settings.PINECONE_MEMORY_INDEX_NAME)
+
         
         # OpenAI for summarization
         self.openai_client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
